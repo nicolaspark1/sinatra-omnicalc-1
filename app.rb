@@ -48,3 +48,32 @@ get("/random/results") do
   @the_result = rand(@the_min..@the_max)
   erb(:random_results)
 end
+
+# payment
+get("/payment/new") do
+ 
+  erb(:new_payment_calc)
+end
+
+get("/payment/results") do
+  @the_apr = params.fetch("users_apr").to_f
+  @the_years = params.fetch("users_years").to_i
+  @the_principal = params.fetch("users_principal").to_f
+
+  @rate = @the_apr / 1200
+  @final_apr = @the_apr.to_fs(:percentage, { :precision => 4 } )
+  @n = @the_years * 12
+
+  @numerator = @rate * @the_principal
+  @final_principal = @the_principal.to_fs(:currency)
+
+  @sub_denominator = 1 + @rate
+  @next_sub_denominator = @sub_denominator ** -@n
+  @denominator = 1 - @next_sub_denominator
+
+
+
+  @almost = @numerator / @denominator
+  @the_result = @almost.to_fs(:currency)
+  erb(:payment_results)
+end
